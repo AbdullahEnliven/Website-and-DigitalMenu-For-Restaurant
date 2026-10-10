@@ -1,0 +1,1 @@
+{"name":"red-booth-diner","private":true,"scripts":{"dev":"node --watch --env-file=.env server.js","start":"node server.js"},"dependencies":{"express":"4.19.2","pg":"8.12.0"}}
