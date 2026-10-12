@@ -21,9 +21,9 @@
   const leafHtml=single
    ?[cover,...cats.map((c,i)=>face(c,i+1,'front'))].map(f=>`<div class="leaf">${f}${blank}</div>`)
    :[[null,0],[1,2],[3,4]].map(([a,b])=>`<div class="leaf">${a==null?cover:face(cats[a],a+1,'front')}${face(cats[b],b+1,'back')}</div>`);
-  const H=single?['Tap the cover to open',...cats.map(c=>c.name),'Ready to order?']:['Tap the cover to open','Starters and Burgers','Steaks and Drinks','Desserts'];
+  const H=single?['Use the arrow to open',...cats.map(c=>c.name),'Ready to order?']:['Use the arrow to open','Starters and Burgers','Steaks and Drinks','Desserts'];
   host.innerHTML=`<div class="mb ${single?'one':''}"><div class="scene"><div class="book ${single?'single':''}" id="bk"><div class="base"><div class="face thanks"><h2>Ready to order?</h2><a class="btn alt" href="#sum">View your order</a></div></div>${leafHtml.join('')}</div></div>
-  <div class="ctrl"><button id="pv" aria-label="Previous page">←</button><span id="ht"></span><button id="nx" aria-label="Next page">→</button></div><p class="tip">Tap a dish to add it, then use + and − for how many. Tap an empty part of the page or the arrows to turn the page.</p></div>`;
+  <div class="ctrl"><button id="pv" aria-label="Previous page">←</button><span id="ht"></span><button id="nx" aria-label="Next page">→</button></div><p class="tip">Tap a dish to add it, then use + and − for how many. Use the arrows below to turn the pages.</p></div>`;
   const bk=$('bk');leaves=[...bk.querySelectorAll('.leaf')];N=leaves.length;
   step=0;if(first&&startCat!=null)step=single?startCat+1:[1,1,2,2,3][Math.min(startCat,4)];
   function render(){leaves.forEach((l,i)=>{const f=i<step;l.classList.toggle('flip',f);l.style.zIndex=f?i+1:N-i+1;const fr=l.querySelector('.face.front'),bc=l.querySelector('.face.back');if(fr)fr.style.pointerEvents=f?'none':'auto';if(bc)bc.style.pointerEvents=f?'auto':'none';
@@ -36,7 +36,7 @@
    else if(e.target.closest('.qt'))return true;
    else{if(cart[n])delete cart[n];else cart[n]=1}
    sync();return true};
-  leaves.forEach((l,i)=>l.onclick=e=>{if(pick(e))return;if(e.target.closest('a,button'))return;go(i<step?i:i+1)});
+  leaves.forEach(l=>l.onclick=e=>{pick(e)});
   bk.onkeydown=e=>{if(e.key!=='Enter'&&e.key!==' ')return;const li=e.target.closest&&e.target.closest('li[data-n]');if(!li||e.target!==li)return;e.preventDefault();const n=li.dataset.n;if(cart[n])delete cart[n];else cart[n]=1;sync()};
   $('pv').onclick=()=>go(step-1);$('nx').onclick=()=>go(step+1);render();sync();
  }
@@ -57,7 +57,7 @@
   f.onsubmit=async e=>{e.preventDefault();const err=f.querySelector('.err');err.textContent='';
    const items=Object.keys(cart).map(name=>({name,qty:cart[name]}));if(!items.length){err.textContent='Please select at least one dish.';return}
    const b=Object.fromEntries(new FormData(f));b.items=items;const r=await post('/api/orders',b),j=await r.json().catch(()=>({}));
-   if(r.ok){cart={};save();done=true;sync();$('sum').innerHTML=`<p class="okmsg">Thanks ${esc(b.name)}! Your order is in. We will call you to confirm. <a href="/account"><b>Track it in your account</b></a>.</p>`;scrollTo({top:$('sum').offsetTop-120})}
+   if(r.ok){cart={};save();done=true;sync();$('sum').innerHTML=`<p class="okmsg">Thanks ${esc(b.name)}! Your order is in. We will call you to confirm.<br>⏱ Expected delivery time: about <b>30 minutes</b> (it can take longer if your location is far from the restaurant).<br><a href="/account"><b>Track it in your account</b></a>.</p>`;scrollTo({top:$('sum').offsetTop-120})}
    else if(r.status===401)loginNote(chk,'to place your order.');else err.textContent=j.error||'Something went wrong'}}
 
  build(true);

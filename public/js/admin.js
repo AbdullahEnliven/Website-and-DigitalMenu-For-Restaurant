@@ -30,6 +30,9 @@ function actions(r,past){
  if(main==='reservations')return past?'':ab(r,'cancelled','Cancel','dng');
  return (NEXT[r.status]?ab(r,NEXT[r.status][0],NEXT[r.status][1],'go'):'')+(r.status==='delivered'?'':ab(r,'cancelled','Cancel','dng'))}
 const badge=r=>`<span class="bd ${CLS[r.status]||''}">${esc(LBL[r.status]||r.status)}</span>`+(r.status==='cancelled'?`<small class="by">${by(r)}</small>`:'');
+const lt=i=>new Date(i).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}),ldt=i=>new Date(i).toLocaleString([],{dateStyle:'medium',timeStyle:'short'});
+const etaOf=r=>r.eta_at&&['new','confirmed','out for delivery'].includes(r.status)?`<small class="by">Promised: arrives by <b>${lt(r.eta_at)}</b> (${r.eta_minutes} min)</small>`:'';
+const etaBox=r=>['new','confirmed','out for delivery'].includes(r.status)?`<div class="etab"><label>Delivery time<span><input class="emin" type="number" min="5" max="480" step="5" value="${r.eta_minutes||30}" aria-label="Minutes"> min</span></label><button class="ab go" data-eta="${r.id}">${r.eta_at?'Update time':'Set time'}</button></div>`:'';
 const who=r=>`<b>${esc(r.name)}</b><br><a class="tel" href="tel:${esc(r.phone)}">${esc(r.phone)}</a>`;
 const itemsOf=r=>Array.isArray(r.items)&&r.items.length?`<ul class="its">${r.items.map(x=>`<li>${x.qty} × ${esc(x.name)}</li>`).join('')}</ul>${r.total?`<div class="tot">Total ${money(r.total)}</div>`:''}`:esc(r.item||'-');
 function counts(){const now=Date.now(),today=dkey(now),O=d.orders,R=d.reservations,live=R.filter(r=>r.status==='confirmed');
@@ -41,7 +44,7 @@ function draw(){
  const newN=d.orders.filter(r=>r.status==='new').length;
  $('mt').innerHTML=[['orders','Home deliveries'],['reservations','Table reservations']].map(([k,n])=>`<button data-m="${k}" class="${main===k?'on':''}">${n}${k==='orders'&&newN?` <i class="pip">${newN}</i>`:''}</button>`).join('');
  $('st').innerHTML=T.map(t=>`<button data-s="${t[0]}" class="${sub===t[0]?'on':''}">${t[1]} (${rows.filter(r=>t[2].includes(r.status)).length})</button>`).join('');
- $('note').textContent='Times are in restaurant time'+(tz?' ('+tz+')':'')+'. This page refreshes by itself every 10 seconds.';
+ $('note').textContent='Order and delivery times use your device time. Reservation times are in restaurant time'+(tz?' ('+tz+')':'')+'. This page refreshes by itself every 10 seconds.';
  drawList()}
 function drawList(){
  const rows=d[main],cur=TABS[main].find(t=>t[0]===sub),o=main==='orders',now=Date.now();
@@ -51,15 +54,19 @@ function drawList(){
  if(!list.length){$('lst').innerHTML=`<p class="empty">${q?'Nothing matches your search.':o?'No orders here yet.':'No reservations here yet.'}</p>`;return}
  const head=o?['Received','Customer','Items','Address','Status','Action']:['When','Customer','Guests','Table','Status','Action'];
  const tr=r=>{
-  if(o)return `<tr class="${r.status==='new'?'isnew':''}"><td data-label="Received">${fdt(r.created_at)}</td><td data-label="Customer">${who(r)}</td><td data-label="Items">${itemsOf(r)}</td><td data-label="Address">${esc(r.address)}</td><td data-label="Status">${badge(r)}</td><td data-label="Action"><div class="acts">${actions(r)}</div></td></tr>`;
+  if(o)return `<tr class="${r.status==='new'?'isnew':''}"><td data-label="Received">${ldt(r.created_at)}</td><td data-label="Customer">${who(r)}</td><td data-label="Items">${itemsOf(r)}</td><td data-label="Address">${esc(r.address)}</td><td data-label="Status">${badge(r)}${etaOf(r)}</td><td data-label="Action"><div class="acts">${actions(r)}</div>${etaBox(r)}</td></tr>`;
   const past=new Date(r.ends_at)<now,td=dkey(r.starts_at)===dkey(now);
   return `<tr class="${past&&r.status!=='cancelled'?'past':''}"><td data-label="When"><b>${fday(r.starts_at)}</b>${td?' <span class="bd ok">Today</span>':''}<br>${tmf(r.starts_at)} – ${tmf(r.ends_at)}</td><td data-label="Customer">${who(r)}</td><td data-label="Guests">${r.guests}</td><td data-label="Table">${esc(r.table_name)} (${r.seats} seats)</td><td data-label="Status">${badge(r)}${past&&r.status!=='cancelled'?'<small class="by">Finished</small>':''}</td><td data-label="Action"><div class="acts">${actions(r,past)}</div></td></tr>`};
  $('lst').innerHTML=`<table class="atbl"><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${list.map(tr).join('')}</tbody></table>`}
 app.onclick=async e=>{
  const b=e.target.closest('button');if(!b||!d)return;
+ if(b.dataset.eta){const inp=b.closest('.etab').querySelector('.emin'),m=Math.round(+inp.value);
+  if(!(m>=5&&m<=480)){alert('Please enter the delivery time in minutes (5 to 480).');return}
+  b.disabled=true;const r=await fetch('/api/admin/data',{method:'PATCH',headers:{'Content-Type':'application/json','x-admin-token':tok},body:JSON.stringify({type:'orders',id:b.dataset.eta,eta_minutes:m})});
+  if(!r.ok){const j=await r.json().catch(()=>({}));alert(j.error||'Could not save the time.')}load();return}
  if(b.dataset.m){main=b.dataset.m;sub='active';return draw()}
  if(b.dataset.s){sub=b.dataset.s;return draw()}
  if(b.dataset.st){if(b.dataset.st==='cancelled'&&!confirm('Cancel this '+(main==='orders'?'order':'reservation')+'?'))return;
   b.disabled=true;const r=await fetch('/api/admin/data',{method:'PATCH',headers:{'Content-Type':'application/json','x-admin-token':tok},body:JSON.stringify({type:main,id:b.dataset.id,status:b.dataset.st})});
   if(!r.ok){const j=await r.json().catch(()=>({}));alert(j.error||'Could not update. Please try again.')}load()}};
-load();setInterval(()=>{if(d)load()},10000);
+load();setInterval(()=>{const a=document.activeElement;if(d&&!(a&&a.closest&&a.closest('.etab')))load()},10000);

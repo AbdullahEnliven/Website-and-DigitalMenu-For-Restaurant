@@ -26,7 +26,7 @@ app.post('/api/login',w(async(q,s)=>{
  A.ok(k);A.setSession(q,s,u.id);s.json(pub(u))}));
 app.post('/api/logout',(q,s)=>{A.clearSession(s);s.json({ok:true})});
 app.get('/api/my',w(async(q,s)=>{const u=await user(q);if(!u)return need(s);
- const o=await pool.query('select id,item,items,total::float total,address,status,cancelled_by,created_at from orders where user_id=$1 order by created_at desc limit 100',[u.id]);
+ const o=await pool.query('select id,item,items,total::float total,address,status,cancelled_by,created_at,eta_minutes,eta_at from orders where user_id=$1 order by created_at desc limit 100',[u.id]);
  const r=await pool.query('select r.id,r.guests,r.starts_at,r.status,r.cancelled_by,t.seats from reservations r join tables t on t.id=r.table_id where r.user_id=$1 order by r.starts_at desc limit 100',[u.id]);
  s.json({orders:o.rows,reservations:r.rows,tz:TZ})}));
 app.post('/api/my/cancel',w(async(q,s)=>{const u=await user(q);if(!u)return need(s);
@@ -75,6 +75,10 @@ app.get('/api/admin/data',w(async(q,s)=>{if(!A.isAdmin(q))return s.status(401).j
  const r=await pool.query('select r.*,t.seats,t.name table_name from reservations r join tables t on t.id=r.table_id order by r.starts_at desc limit 400');
  s.json({orders:o.rows,reservations:r.rows,tz:TZ})}));
 app.patch('/api/admin/data',w(async(q,s)=>{if(!A.isAdmin(q))return s.status(401).json({});
+ if(q.body&&q.body.type==='orders'&&'eta_minutes'in q.body){const m=q.body.eta_minutes===null?null:Math.round(+q.body.eta_minutes);
+  if(m!==null&&!(m>=5&&m<=480))return s.status(400).json({error:'Delivery time must be between 5 and 480 minutes.'});
+  const r=await pool.query("update orders set eta_minutes=$1,eta_at=case when $1::int is null then null else now()+($1::int*interval '1 minute') end where id=$2 and status in ('new','confirmed','out for delivery')",[m,+q.body.id]);
+  return r.rowCount?s.json({ok:true}):s.status(409).json({error:'This order is already delivered or cancelled.'})}
  const{type,id,status}=q.body||{};if(!OK[type]?.includes(status))return s.status(400).json({});
  if(type==='reservations'&&status==='confirmed'){const{rows:[r]}=await pool.query('select table_id,starts_at,ends_at from reservations where id=$1',[+id]);
   if(r&&(await pool.query("select 1 from reservations where table_id=$1 and id<>$2 and status<>'cancelled' and starts_at<$4 and ends_at>$3 limit 1",[r.table_id,+id,r.starts_at,r.ends_at])).rowCount)return s.status(409).json({error:'That table is already booked at this time, so this reservation cannot be re-confirmed.'})}

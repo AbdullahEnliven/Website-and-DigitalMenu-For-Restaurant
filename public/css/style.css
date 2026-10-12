@@ -283,3 +283,15 @@ p{margin-bottom:14px}.lead{font-size:18px;max-width:56ch}.muted{opacity:.7;font-
 .form input[type=date]{padding-right:24px}
 .form input[type=date]::-webkit-calendar-picker-indicator{width:20px;height:20px;margin:0;padding:0;background-size:20px;cursor:pointer}
 .form select{-webkit-appearance:none;appearance:none;padding-right:56px;cursor:pointer;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 8l5 5 5-5' fill='none' stroke='%232b1a10' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 24px center/20px 20px}
+
+/* v12: dish number, light arrows at the ends, delivery time note */
+.dn{position:absolute;left:clamp(16px,4vw,48px);top:14px;font:400 26px/1 Anton,Impact,sans-serif;color:var(--text);opacity:.8}
+.arrow:disabled{opacity:.28;cursor:default;pointer-events:none}
+.eta{display:inline-block;background:#fff3d6;border:1px solid rgba(43,26,16,.18);border-radius:14px;padding:9px 16px;font-size:15px;margin:2px 0 18px;max-width:60ch}
+.okmsg .eta,.okmsg b{font-weight:700}
+
+/* v13: admin delivery time box, customer arrival time */
+.etab{display:flex;flex-direction:column;gap:6px;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(43,26,16,.2)}
+.etab label{display:flex;flex-direction:column;gap:3px;font-size:12px;font-weight:700;opacity:.8}.etab label span{display:flex;align-items:center;gap:6px;font-weight:500}
+.etab .emin{width:78px;padding:6px 8px;border:2px solid rgba(43,26,16,.25);border-radius:10px;font:inherit}
+.eta2{margin-top:6px;font-size:13px;color:#1d6b2a;background:#e6f3e6;border-radius:10px;padding:6px 10px;white-space:normal;max-width:240px}
