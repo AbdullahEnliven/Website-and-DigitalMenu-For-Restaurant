@@ -14,7 +14,7 @@ if(hd){const H=hd.firstElementChild,B=$('bg'),set=o=>{H.classList.toggle('mo',o)
  document.addEventListener('click',e=>{if(!H.contains(e.target))set(false)});
  addEventListener('keydown',e=>{if(e.key==='Escape')set(false)});
  matchMedia('(min-width:901px)').addEventListener('change',e=>{if(e.matches)set(false)})}
-me.then(u=>{const a=$('acl'),a2=$('acl2');if(u)for(const x of[a,a2])if(x){x.href='/account';x.textContent='My account'}});
+me.then(u=>{const a=$('acl'),a2=$('acl2');if(u)for(const x of[a,a2])if(x){x.href='/account';x.textContent='My order & reservation'}});
 if(ft)ft.innerHTML=`<footer class="ftr"><div class="fg"><div><div class="brand">RED BOOTH DINER</div><p>Family-owned American diner. Burgers, steaks and thick shakes served the old-school way.</p></div>
 <div><h4>MENU</h4>${['starters:Starters','burgers:Burgers','steaks:Steaks','drinks:Shakes & Drinks','desserts:Desserts'].map(x=>x.split(':')).map(([s,n])=>`<a href="/menu/${s}" target="_blank">${n}</a>`).join('')}</div>
 <div><h4>DINER</h4><a href="/#story">Our story</a><a href="/#reviews">Reviews</a><a href="/reserve">Reserve a table</a><a href="/order">Home delivery</a></div>
