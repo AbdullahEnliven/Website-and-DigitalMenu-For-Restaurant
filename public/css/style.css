@@ -295,3 +295,125 @@ p{margin-bottom:14px}.lead{font-size:18px;max-width:56ch}.muted{opacity:.7;font-
 .etab label{display:flex;flex-direction:column;gap:3px;font-size:12px;font-weight:700;opacity:.8}.etab label span{display:flex;align-items:center;gap:6px;font-weight:500}
 .etab .emin{width:78px;padding:6px 8px;border:2px solid rgba(43,26,16,.25);border-radius:10px;font:inherit}
 .eta2{margin-top:6px;font-size:13px;color:#1d6b2a;background:#e6f3e6;border-radius:10px;padding:6px 10px;white-space:normal;max-width:240px}
+
+/* ===== v14: mobile (iOS + Android) fixes. Everything below is inside phone/tablet media queries, laptop is untouched ===== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button,.btn,.ab,a{touch-action:manipulation}
+
+@media(max-width:900px){
+ /* no sideways swipe: the scroll animation used to start 80px outside the screen */
+ html,body{overflow-x:clip}
+ .rv.rv-l:not(.in),.rv.rv-r:not(.in){translate:0 40px}
+
+ /* hero: same look as the laptop (RED / BOOTH stacked, "Diner" script beside RED, chef below) and no empty space under the chef */
+ .hero2{min-height:0;gap:0;padding:22px 16px 0;align-items:stretch}
+ .eyebrow2{align-self:flex-start;font-size:12px;letter-spacing:.18em;margin:0 0 4px 2px}
+ .mega{align-self:flex-start;width:fit-content;text-align:left;white-space:normal;font-size:min(36vw,230px);line-height:.9;margin:0 0 0 1px}
+ .mega>span{display:block}.mega .w{display:block}
+ .mega em{left:62%;right:auto;top:4%;font-size:clamp(40px,14vw,96px)}
+ .chefv{align-self:center;width:min(84vw,400px);margin-top:-5vw}
+}
+@supports(height:100svh){@media(max-width:900px){.mega{font-size:min(36vw,230px,32svh)}.chefv{width:min(84vw,400px,calc(80svh*.75))}}}
+@media(max-width:380px){.eyebrow2{font-size:11px;letter-spacing:.14em}}
+
+/* header on phones: brand + Log in on the first row, the two buttons side by side on the second row */
+@media(max-width:600px){
+ .hdr{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 12px;padding:10px 16px}
+ .hdr .brand{grid-column:1;font-size:18px;white-space:nowrap}
+ .hdr .acl{grid-column:2;justify-self:end;font-size:13px;line-height:1;padding:0;margin:0}
+ .hdr .hbtns{grid-column:1/-1;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+ .hdr .hbtns .btn{text-align:center;padding:9px 10px;white-space:nowrap}
+}
+
+/* menu book: phones get one big readable page (same as the order page) instead of two tiny pages */
+@media(max-width:700px){.buy .price:empty{display:none}}
+@supports(height:100svh){@media(max-width:900px){.sl.open .info{max-height:62svh}}}
+
+/* order bar and menu slider on small screens */
+@media(max-width:700px){
+ .obar{width:max-content;max-width:calc(100vw - 24px);white-space:nowrap;bottom:max(14px,env(safe-area-inset-bottom));gap:12px;padding:8px 8px 8px 18px;font-size:14px}
+ .mb .ctrl{width:100%;max-width:340px;gap:10px}.mb .ctrl span{min-width:0;flex:1}.mb .ctrl button{flex:none}
+ .mb .face{box-shadow:0 10px 22px rgba(0,0,0,.32)}
+ .info{margin-bottom:max(12px,env(safe-area-inset-bottom))}
+}
+
+/* account + admin tables become cards on phones: label on the left, value on the right, nothing is cut off */
+@media(max-width:760px){
+ .mtbl thead{display:none}
+ .mtbl,.mtbl tbody,.mtbl tr{display:block;width:100%}
+ .mtbl tr{background:#fff;border:2px solid rgba(43,26,16,.12);border-radius:16px;padding:8px 14px;margin:0 0 12px}
+ .mtbl td{border:0;padding:6px 0}
+ .mtbl td::before,.atbl td::before{content:attr(data-label);font-weight:700;opacity:.55;font-size:13px}
+ .mtbl td,.atbl td{display:grid;grid-template-columns:84px minmax(0,1fr);column-gap:12px;row-gap:0;align-items:start;justify-items:start}
+ .mtbl td::before,.atbl td::before{grid-column:1;grid-row:1;min-width:0}
+ .mtbl td>*,.atbl td>*{grid-column:2;min-width:0}
+ .mtbl td>br,.atbl td>br{display:none}
+ .mtbl td[data-label=""]::before{display:none}.mtbl td[data-label=""]>*{grid-column:1/-1}
+ .mtbl .btn.sm{margin-left:0}
+ .mtbl .its,.atbl .its{padding-left:0}
+ .atbl .acts,.atbl .etab{justify-self:stretch}
+ .atbl .etab label span{flex-wrap:wrap}
+}
+
+/* menu book on phones: the same two-page book that opens like on the laptop. The book is as wide as the phone allows
+   and the writing is made bigger so it can be read (sizes are still relative to the page width --W) */
+@media(max-width:700px),(max-height:500px) and (pointer:coarse){
+ :root{--W:min(46vw,50vh)}
+ .mb{padding-top:12px}
+ .mb .book{height:calc(var(--W)*1.58)}
+ .mb .face{padding:calc(var(--W)*.06)}
+ .mb .pt{font-size:calc(var(--W)*.072);margin-top:0}
+ .mb h2.ch{font-size:calc(var(--W)*.075);margin:calc(var(--W)*.04) 0 calc(var(--W)*.005);padding:calc(var(--W)*.012) calc(var(--W)*.045)}
+ .mb .tg{font-size:calc(var(--W)*.085);margin:0 0 calc(var(--W)*.03);min-height:calc(var(--W)*.19)}
+ .mb ul.box{padding:calc(var(--W)*.04) calc(var(--W)*.035);gap:calc(var(--W)*.03);border-radius:calc(var(--W)*.05)}
+ .mb .box li{font-size:calc(var(--W)*.068);line-height:1.12;gap:calc(var(--W)*.02)}
+ .mb .box li b{font-size:calc(var(--W)*.058);white-space:nowrap}
+ .mb .ob li{gap:calc(var(--W)*.015)}
+ .mb .ob .nm{font-size:inherit}
+ .mb .scr{font-size:calc(var(--W)*.17)}
+ .mb .cover h1{font-size:calc(var(--W)*.23)}
+ .mb .tag{font-size:calc(var(--W)*.04);letter-spacing:.1em}
+ .mb .open{font-size:calc(var(--W)*.045)}
+ .mb .thanks h2{font-size:calc(var(--W)*.17)}
+ .mb .pg{font-size:calc(var(--W)*.06);bottom:calc(var(--W)*.03)}
+}
+
+/* both pages of the book start their list at the same height: the tagline always has room for two lines (a long one like "Choose rare, medium or well done." used to push its list down) */
+@media(max-width:900px){.mb .tg{display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.1;min-height:calc(var(--W)*.155)}}
+@media(max-width:700px),(max-height:500px) and (pointer:coarse){.mb .tg{min-height:calc(var(--W)*.19)}}
+
+/* v12 ---------- phone: compact header with hamburger menu ---------- */
+.burger,.mnav{display:none}
+@media(max-width:900px){
+ .hdr,.home .hdr{display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:12px;padding:7px 16px}
+ .hdr .brand{font-size:18px;margin:0;white-space:nowrap}
+ .hdr nav,.hdr .call,.hdr .acl,.hdr .hbtns{display:none}
+ .burger{display:flex;flex-direction:column;justify-content:center;gap:5px;width:40px;height:36px;padding:0 8px;border:0;background:transparent;color:inherit;cursor:pointer;border-radius:8px}
+ .burger span{display:block;height:2.5px;border-radius:2px;background:currentColor;transition:transform .3s,opacity .2s}
+ .hdr.mo .burger span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
+ .hdr.mo .burger span:nth-child(2){opacity:0}
+ .hdr.mo .burger span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
+ .mnav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:2px;padding:10px 16px 18px;background:#2a0f06;border-bottom:1px solid rgba(255,255,255,.12);box-shadow:0 18px 30px rgba(0,0,0,.35)}
+ .hdr.mo .mnav{display:flex}
+ .mnav a{text-decoration:none;font-weight:700;font-size:17px;padding:11px 4px;color:#fff}
+ .mnav a.mo{color:#e8743f}
+ .mnav a.mlog{margin-top:10px;text-align:center;background:#C9552F;color:#fff1d6;border-radius:12px;padding:12px 16px}
+}
+
+/* v12 ---------- home page menu book: one big page at a time on phones (same as the order page) ---------- */
+.mb.one{--W:min(80vw,56vh)}
+.mb.one .face{overflow-y:auto;scrollbar-width:none}.mb.one .face::-webkit-scrollbar{display:none}
+.mb.one .box li:hover{transform:none;color:inherit}
+
+/* v12 ---------- phone menu slider: arrows sit under the dishes so the left and right dishes stay fully visible ---------- */
+@media(max-width:700px){
+ .stage .arrow{top:auto;bottom:clamp(16px,6cqh,56px);margin-top:0}
+ .stage .arrow.prev{left:calc(50% - 74px)}
+ .stage .arrow.next{right:auto;left:calc(50% + 32px)}
+}
+
+/* v13 ---------- phone book (single page): no flip / tilt / float animation, the next page simply appears ---------- */
+.mb.one .scene{animation:none;perspective:none}
+.mb.one .book,.mb.one .book.single{transform:none;transition:none}
+.mb.one .leaf,.mb.one .base{transition:none!important}
+.mb.one .leaf.flip{transform:none;opacity:0;visibility:hidden}

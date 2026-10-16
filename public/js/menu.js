@@ -14,14 +14,15 @@
   sl.classList.toggle('open',open);
   sl.style.setProperty('--bg',t.bg);sl.style.setProperty('--ink',t.ink);sl.style.setProperty('--text',t.d?'#fff7e8':'#2b1a10');
   const wd=$('wd');wd.textContent=x.name.split(' ')[0].toUpperCase();wd.style.animation='none';wd.offsetHeight;wd.style.animation='';
-  plates.forEach((p,i)=>{const o=i-cur,c=o===0;
+  const h=Math.floor(n/2);
+  plates.forEach((p,i)=>{const o=((i-cur+n+h)%n)-h,c=o===0; // circular: the last dish shows on the left of the first one
    p.style.transform=c&&open?'translate(-50%,-50%) scale(.95) rotate(360deg)':`translate(calc(-50% + ${o*34}vw),-50%) scale(${c?1:.6}) rotate(${o*7}deg)`;
    p.style.opacity=open&&!c?0:Math.abs(o)>1?0:c?1:.85;p.style.pointerEvents=open&&!c?'none':'';p.style.zIndex=c?3:1});
   dots.forEach((d,i)=>d.classList.toggle('on',i===cur));
-  $('dn').textContent=cur+1;$('pv').disabled=cur===0;$('nx').disabled=cur===n-1;
+  $('dn').textContent=cur+1;
   $('nm').textContent=x.name;$('dtl').innerHTML=detail(x);
   $('pr').textContent=open?money(x.price):'';$('vw').textContent=open?'Close':'View'}
- const go=i=>{cur=Math.max(0,Math.min(n-1,i));open=false;paint()};
+ const go=i=>{cur=((i%n)+n)%n;open=false;paint()};
  plates.forEach(p=>p.onclick=()=>{const i=+p.dataset.i;if(i===cur){open=!open;paint()}else go(i)});
  dots.forEach(d=>d.onclick=()=>go(+d.dataset.i));
  $('pv').onclick=()=>go(cur-1);$('nx').onclick=()=>go(cur+1);$('vw').onclick=()=>{open=!open;paint()};

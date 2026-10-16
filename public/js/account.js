@@ -7,10 +7,10 @@
  const can=(t,r)=>t==='orders'?['new','confirmed'].includes(r.status):r.status==='confirmed'&&new Date(r.starts_at)>new Date();
  const btn=(t,r)=>can(t,r)?`<button class="btn ghost sm" data-t="${t}" data-id="${r.id}">Cancel</button>`:'';
  const items=r=>Array.isArray(r.items)&&r.items.length?`<ul class="its">${r.items.map(x=>`<li>${x.qty} × ${esc(x.name)}</li>`).join('')}</ul>${r.total?`<div class="tot">Total ${money(r.total)}</div>`:''}`:esc(r.item||'-');
- const table=(head,rows)=>`<div class="scroll"><table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
- const rv=r=>`<tr><td>${dt(r.starts_at,tz)}</td><td>${r.guests}</td><td>${r.seats} seats</td><td>${bd(r)}</td><td>${btn('reservations',r)}</td></tr>`;
+ const table=(head,rows)=>`<div class="scroll"><table class="mtbl"><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+ const rv=r=>`<tr><td data-label="When">${dt(r.starts_at,tz)}</td><td data-label="Guests">${r.guests}</td><td data-label="Table">${r.seats} seats</td><td data-label="Status">${bd(r)}</td><td data-label="">${btn('reservations',r)}</td></tr>`;
  const eta=r=>r.eta_at&&['new','confirmed','out for delivery'].includes(r.status)?`<div class="eta2">⏱ Estimated arrival: <b>${new Date(r.eta_at).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}</b><br><small>Restaurant's estimate: ${r.eta_minutes} min</small></div>`:'';
- const od=r=>`<tr><td>${dt(r.created_at)}</td><td>${items(r)}</td><td>${esc(r.address)}</td><td>${bd(r)}${eta(r)}</td><td>${btn('orders',r)}</td></tr>`;
+ const od=r=>`<tr><td data-label="Placed">${dt(r.created_at)}</td><td data-label="Items">${items(r)}</td><td data-label="Address">${esc(r.address)}</td><td data-label="Status">${bd(r)}${eta(r)}</td><td data-label="">${btn('orders',r)}</td></tr>`;
  const sec=(title,list,head,row,empty)=>`<h3 class="sec">${title}<small>(${list.length})</small></h3>${list.length?table(head,list.map(row)):`<p class="muted">${empty}</p>`}`;
  async function load(){const r=await fetch('/api/my');if(r.status===401){location.href='/login?next=/account';return}d=await r.json();tz=d.tz;draw()}
  function draw(){

@@ -8,7 +8,7 @@
  const save=()=>{try{sessionStorage.setItem(KEY,JSON.stringify(cart))}catch(e){}};
  root.innerHTML=`<div id="bk0"></div><section class="osum" id="sum"><h2>Your order</h2><div id="lines"></div><div id="chk"></div></section>`;
  const u=await me;let done=false,step=0,single=false,N=0,leaves=[];
- const mq=matchMedia('(max-width:700px)');
+ const mq=matchMedia('(max-width:700px)'),PHONE_SINGLE_PAGE=true; // true = phones get one page at a time (laptop keeps the two-page book)
 
  // ---------- the menu book (same look as the home page, but every dish can be ticked)
  const row=m=>{const q=cart[m.name]||0;return `<li data-n="${esc(m.name)}" class="${q?'on':''}" role="checkbox" aria-checked="${q>0}" tabindex="0"><span class="tk"></span><span class="nm">${esc(m.name)}</span><b>${money(m.price)}</b><span class="qt"><button type="button" data-d="-1" aria-label="Less">−</button><i>${q||1}</i><button type="button" data-d="1" aria-label="More">+</button></span></li>`};
@@ -17,7 +17,7 @@
  const blank='<div class="face back"></div>';
 
  function build(first){
-  single=mq.matches;const host=$('bk0');
+  single=PHONE_SINGLE_PAGE&&mq.matches;const host=$('bk0');
   const leafHtml=single
    ?[cover,...cats.map((c,i)=>face(c,i+1,'front'))].map(f=>`<div class="leaf">${f}${blank}</div>`)
    :[[null,0],[1,2],[3,4]].map(([a,b])=>`<div class="leaf">${a==null?cover:face(cats[a],a+1,'front')}${face(cats[b],b+1,'back')}</div>`);

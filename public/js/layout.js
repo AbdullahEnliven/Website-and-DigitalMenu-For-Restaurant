@@ -5,8 +5,16 @@ const $=id=>document.getElementById(id);
 const hd=$('hdr'),ft=$('ftr');
 const me=fetch('/api/me').then(r=>r.ok?r.json():null).catch(()=>null);
 if(hd)hd.innerHTML=`<header class="hdr"><a href="/" class="brand">RED BOOTH DINER</a><nav><a href="/#story">Our story</a><a href="/#menu">Menu</a><a href="/#reviews">Reviews</a></nav>
-<div class="call"><small>CALL US TODAY</small><b>(555) 010-1966</b></div><a class="acl" id="acl" href="/login">Log in</a><div class="hbtns"><a class="btn alt" href="/reserve">Reserve</a><a class="btn alt" href="/order">Order delivery</a></div></header>`;
-me.then(u=>{const a=$('acl');if(a&&u){a.href='/account';a.textContent='My account'}});
+<div class="call"><small>CALL US TODAY</small><b>(555) 010-1966</b></div><a class="acl" id="acl" href="/login">Log in</a><div class="hbtns"><a class="btn alt" href="/reserve">Reserve</a><a class="btn alt" href="/order">Order delivery</a></div>
+<button class="burger" id="bg" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mnav"><span></span><span></span><span></span></button>
+<div class="mnav" id="mnav"><a href="/#story">Our story</a><a href="/#menu">Menu</a><a href="/#reviews">Reviews</a><a class="mo" href="/order">Order now</a><a class="mo" href="/reserve">Reserve</a><a class="mlog" id="acl2" href="/login">Log in</a></div></header>`;
+if(hd){const H=hd.firstElementChild,B=$('bg'),set=o=>{H.classList.toggle('mo',o);B.setAttribute('aria-expanded',o);B.setAttribute('aria-label',o?'Close menu':'Open menu')};
+ B.onclick=e=>{e.stopPropagation();set(!H.classList.contains('mo'))};
+ $('mnav').addEventListener('click',e=>{if(e.target.closest('a'))set(false)});
+ document.addEventListener('click',e=>{if(!H.contains(e.target))set(false)});
+ addEventListener('keydown',e=>{if(e.key==='Escape')set(false)});
+ matchMedia('(min-width:901px)').addEventListener('change',e=>{if(e.matches)set(false)})}
+me.then(u=>{const a=$('acl'),a2=$('acl2');if(u)for(const x of[a,a2])if(x){x.href='/account';x.textContent='My account'}});
 if(ft)ft.innerHTML=`<footer class="ftr"><div class="fg"><div><div class="brand">RED BOOTH DINER</div><p>Family-owned American diner. Burgers, steaks and thick shakes served the old-school way.</p></div>
 <div><h4>MENU</h4>${['starters:Starters','burgers:Burgers','steaks:Steaks','drinks:Shakes & Drinks','desserts:Desserts'].map(x=>x.split(':')).map(([s,n])=>`<a href="/menu/${s}" target="_blank">${n}</a>`).join('')}</div>
 <div><h4>DINER</h4><a href="/#story">Our story</a><a href="/#reviews">Reviews</a><a href="/reserve">Reserve a table</a><a href="/order">Home delivery</a></div>
