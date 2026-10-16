@@ -417,3 +417,10 @@ button,.btn,.ab,a{touch-action:manipulation}
 .mb.one .book,.mb.one .book.single{transform:none;transition:none}
 .mb.one .leaf,.mb.one .base{transition:none!important}
 .mb.one .leaf.flip{transform:none;opacity:0;visibility:hidden}
+
+/* v14 ---------- laptop header: bigger links (phone number block removed) ---------- */
+@media(min-width:901px){
+ .hdr nav{gap:52px}
+ .hdr nav a{font-size:18px;padding:6px 2px}
+ .hdr .acl{font-size:17px}
+}
